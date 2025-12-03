@@ -1,251 +1,353 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Check, RotateCcw, Eye, EyeOff, AlertCircle, Award } from 'lucide-react';
-
-const TARGET_TITLE = "A Memorable Visit to the Golden Temple";
-const TARGET_BODY = "Thailand is renowned for its breathtaking cultural heritage. This picture captures a magnificent moment at a famous tourist attraction, known as the Grand Palace. The scene features two beautiful women enjoying their holiday. Dressed in stylish outfits and wearing wide-brimmed hats to protect against the sun, they stroll gracefully across the stone floor. The background is truly stunning. One can see the majestic temples and the iconic golden stupa shining brightly under the clear sky, which is a lovely mix of blue and white. The area is beautifully decorated with green ornamental trees, adding a touch of nature to the sacred architecture. As they walk through this spiritual place, they might plan to pay respect to the Buddha or make merit. Their smiling faces clearly show that they are happy and impressed by the beauty of Thai culture.";
-
-const FULL_TARGET = `${TARGET_TITLE}\n${TARGET_BODY}`;
-
-export default function App() {
-  const [userInput, setUserInput] = useState("");
-  const [showReference, setShowReference] = useState(true);
-  const [result, setResult] = useState(null);
-  const [isPerfect, setIsPerfect] = useState(false);
-  
-  // Ref for auto-scrolling to error if needed, though simple display is often enough
-  const resultRef = useRef(null);
-
-  const handleCheck = () => {
-    // Clean up input: normalize newlines to single \n just in case, but keep spaces strict
-    // We will compare strictly against FULL_TARGET which expects 1 newline between title and body.
-    
-    // However, users might type multiple enters. Let's normalize the user input slightly to be fair but strict on chars.
-    // Actually, strict "every spot" usually implies whitespace too.
-    // Let's assume the user presses Enter once after the title.
-    
-    const diff = [];
-    let errorCount = 0;
-    const maxLength = Math.max(userInput.length, FULL_TARGET.length);
-
-    for (let i = 0; i < maxLength; i++) {
-      const userChar = userInput[i];
-      const targetChar = FULL_TARGET[i];
-
-      if (userChar === targetChar) {
-        diff.push({ status: 'correct', char: userChar });
-      } else {
-        errorCount++;
-        if (targetChar === undefined) {
-           // User typed extra
-           diff.push({ status: 'extra', char: userChar });
-        } else if (userChar === undefined) {
-           // User missed char
-           diff.push({ status: 'missing', char: targetChar });
-        } else {
-           // Wrong char
-           diff.push({ status: 'wrong', char: userChar, expected: targetChar });
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pictorial Writing Trainer</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configure Tailwind to use 'dark' mode via class -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
         }
-      }
-    }
+    </script>
+    <style>
+        /* Basic font and transition for smooth dark mode */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        /* Custom scrollbar styling for better aesthetics */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #a8a8a8;
+            border-radius: 4px;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <!-- Lucide Icons (equivalent to React imports) -->
+    <script type="module">
+        import { createIcons, Check, RotateCcw, Eye, EyeOff, AlertCircle, Award, Sun, Moon } from 'https://unpkg.com/lucide@latest';
+        createIcons({ icons: { Check, RotateCcw, Eye, EyeOff, AlertCircle, Award, Sun, Moon } });
+    </script>
+</head>
 
-    setResult(diff);
-    setIsPerfect(errorCount === 0);
-    
-    if (errorCount === 0) {
-      // Trigger confetti or success effect ideally, but simple UI for now
-    }
-    
-    // Scroll to result
-    setTimeout(() => {
-        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
-  };
-
-  const handleReset = () => {
-    setUserInput("");
-    setResult(null);
-    setIsPerfect(false);
-    setShowReference(true);
-  };
-
-  const renderReferenceText = () => {
-    // Render with specific underlines as per the original image
-    // Underlined words: women, hats, floor, temples, golden, blue and white, ornamental trees, walk, make merit, happy
-    const underlinedWords = [
-      "women", "hats", "floor", "temples", "golden", 
-      "blue and white", "ornamental trees", "walk", "make merit", "happy"
-    ];
-
-    // Helper to highlight words in the body
-    const renderBodyWithHighlights = () => {
-       let parts = [TARGET_BODY];
-       
-       // This is a simple replacement for display purposes. 
-       // In a real app we might map indices, but since the text is static we can hardcode or split carefully.
-       // However, splitting by word might break sentences. 
-       // Let's just render plain text for now to ensure exact copy, 
-       // adding specific spans for the underlines manually would be complex with overlapping checks.
-       // Given the user wants to "copy text", seeing the text clearly is priority.
-       // I will use a simple regex to wrap known phrases in <u> if strictly needed, 
-       // but for typing practice, plain text is cleaner. 
-       // Let's stick to plain text to avoid confusion about whether they need to format valid HTML.
-       return TARGET_BODY;
-    };
-
-    return (
-      <div className="font-sans text-gray-800 leading-relaxed text-lg bg-white p-6 rounded shadow-sm border border-gray-200">
-        <h2 className="text-xl font-bold text-center mb-4 text-gray-900">{TARGET_TITLE}</h2>
-        <p className="text-justify whitespace-pre-wrap">{renderBodyWithHighlights()}</p>
-      </div>
-    );
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 font-sans">
-      <div className="max-w-4xl mx-auto space-y-8">
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div class="max-w-4xl mx-auto py-8 px-4 space-y-8">
         
-        {/* Header */}
-        <header className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-blue-900">Pictorial Writing Trainer</h1>
-          <p className="text-gray-600">
+        <!-- Header -->
+        <header class="text-center space-y-2">
+          <h1 class="text-3xl font-bold text-blue-900 dark:text-blue-400">Pictorial Writing Trainer</h1>
+          <p class="text-gray-600 dark:text-gray-400">
             ฝึกจำและเขียนข้อความจากภาพให้ถูกต้อง 100% (ทุกตัวอักษร เว้นวรรค และเครื่องหมาย)
           </p>
         </header>
 
-        {/* Control Bar */}
-        <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
-          <div className="flex items-center gap-2">
-             <span className="font-semibold text-gray-700">ต้นฉบับ:</span>
-             <button 
-               onClick={() => setShowReference(!showReference)}
-               className="flex items-center gap-2 px-3 py-1.5 rounded bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-sm font-medium"
-             >
-               {showReference ? <><EyeOff size={16}/> ซ่อน</> : <><Eye size={16}/> แสดง</>}
-             </button>
-          </div>
-          <div className="text-sm text-gray-500">
-             สถานะ: {userInput.length === 0 ? "ยังไม่เริ่ม" : "กำลังพิมพ์..."}
-          </div>
-        </div>
-
-        {/* Reference Area */}
-        {showReference && (
-          <div className="animate-fade-in">
-             <div className="mb-2 text-xs text-gray-400 uppercase tracking-wide font-semibold ml-1">Original Text</div>
-             {renderReferenceText()}
-          </div>
-        )}
-
-        {/* Input Area */}
-        <div className="space-y-2">
-          <div className="flex justify-between items-end">
-             <label className="text-sm font-semibold text-gray-700 ml-1">พื้นที่ฝึกพิมพ์ของคุณ</label>
-             <span className="text-xs text-gray-400">ห้ามใส่เครื่องหมาย _ (ขีดเส้นใต้) ให้พิมพ์แค่ตัวอักษร</span>
-          </div>
-          <textarea
-            value={userInput}
-            onChange={(e) => {
-              setUserInput(e.target.value);
-              setResult(null); // Reset result on edit
-              setIsPerfect(false);
-            }}
-            placeholder="พิมพ์ข้อความที่นี่... (เริ่มด้วยชื่อเรื่อง แล้วขึ้นบรรทัดใหม่เพื่อเขียนเนื้อหา)"
-            className="w-full h-64 p-6 rounded-lg border border-gray-300 shadow-inner text-lg leading-relaxed focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y font-sans"
-            spellCheck={false}
-          />
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-4 justify-center pt-2">
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-2 px-6 py-3 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold transition-all"
-          >
-            <RotateCcw size={20} />
-            เริ่มใหม่
-          </button>
-          <button
-            onClick={handleCheck}
-            disabled={userInput.length === 0}
-            className={`flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition-all transform hover:scale-105 active:scale-95 ${
-              userInput.length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
-            <Check size={20} />
-            ตรวจคำตอบ
-          </button>
-        </div>
-
-        {/* Results Area */}
-        {result && (
-          <div ref={resultRef} className={`rounded-xl p-6 border-2 ${isPerfect ? 'border-green-500 bg-green-50' : 'border-red-200 bg-white'} shadow-lg scroll-mt-10`}>
-            
-            <div className="flex items-center gap-3 mb-4 border-b pb-4">
-              {isPerfect ? (
-                <div className="bg-green-100 p-2 rounded-full text-green-600">
-                  <Award size={32} />
+        <!-- Control Bar -->
+        <div id="control-bar" class="flex justify-between items-center p-4 rounded-lg shadow-md 
+                      bg-white dark:bg-gray-800 transition-colors">
+            <div class="flex items-center gap-4">
+                <!-- Dark Mode Toggle Button -->
+                <button id="dark-mode-toggle" class="p-2 rounded-full text-gray-700 dark:text-yellow-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Toggle Dark Mode">
+                    <i data-lucide="moon" id="moon-icon" class="w-5 h-5 hidden"></i>
+                    <i data-lucide="sun" id="sun-icon" class="w-5 h-5 hidden"></i>
+                </button>
+              
+                <div class="flex items-center gap-2">
+                    <span class="font-semibold text-gray-700 dark:text-gray-300">ต้นฉบับ:</span>
+                    <button id="toggle-reference" class="flex items-center gap-2 px-3 py-1.5 rounded bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-700 transition-colors text-sm font-medium">
+                        <i data-lucide="eye-off" id="eye-off-icon" class="w-4 h-4"></i>
+                        <i data-lucide="eye" id="eye-icon" class="w-4 h-4 hidden"></i>
+                        <span id="reference-text">ซ่อน</span>
+                    </button>
                 </div>
-              ) : (
-                <div className="bg-red-100 p-2 rounded-full text-red-600">
-                  <AlertCircle size={32} />
-                </div>
-              )}
-              <div>
-                <h3 className={`text-xl font-bold ${isPerfect ? 'text-green-800' : 'text-red-800'}`}>
-                  {isPerfect ? "สุดยอด! ถูกต้องทุกตัวอักษร" : "ยังไม่ถูกต้องร้อยเปอร์เซ็นต์"}
-                </h3>
-                {!isPerfect && <p className="text-red-600 text-sm">พบจุดผิดพลาดตามรายการด้านล่าง (สีแดง)</p>}
-              </div>
             </div>
-
-            <div className="font-mono text-lg leading-loose break-words bg-gray-50 p-4 rounded border border-gray-200">
-              {result.map((item, index) => {
-                if (item.status === 'correct') {
-                  return <span key={index} className="text-green-600">{item.char}</span>;
-                }
-                if (item.status === 'wrong') {
-                  return (
-                    <span key={index} className="relative group inline-block mx-0.5">
-                      <span className="bg-red-200 text-red-800 px-1 rounded line-through decoration-red-500 decoration-2">{item.char === ' ' ? '␣' : item.char}</span>
-                      <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
-                        แก้เป็น: {item.expected === ' ' ? 'เว้นวรรค' : item.expected}
-                      </span>
-                    </span>
-                  );
-                }
-                if (item.status === 'missing') {
-                  return (
-                    <span key={index} className="relative group inline-block mx-0.5">
-                      <span className="bg-yellow-200 text-yellow-800 px-1 rounded border border-yellow-400">_</span>
-                      <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
-                        ขาดตัว: {item.char === '\n' ? 'ขึ้นบรรทัดใหม่' : item.char}
-                      </span>
-                    </span>
-                  );
-                }
-                if (item.status === 'extra') {
-                  return (
-                     <span key={index} className="bg-red-500 text-white px-1 rounded mx-0.5" title="พิมพ์เกิน">
-                       {item.char}
-                     </span>
-                  );
-                }
-                return null;
-              })}
+            <div id="status" class="text-sm text-gray-500 dark:text-gray-400">
+                สถานะ: ยังไม่เริ่ม
             </div>
-            
-            {!isPerfect && (
-              <div className="mt-4 text-sm text-gray-500 flex flex-wrap gap-4">
-                 <div className="flex items-center gap-1"><div className="w-4 h-4 bg-green-100 text-green-600 text-center text-xs border border-green-200">A</div> ถูกต้อง</div>
-                 <div className="flex items-center gap-1"><div className="w-4 h-4 bg-red-200 text-red-800 text-center text-xs line-through border border-red-300">A</div> ผิด (เอาเมาส์ชี้เพื่อดูเฉลย)</div>
-                 <div className="flex items-center gap-1"><div className="w-4 h-4 bg-yellow-200 border border-yellow-400 text-center text-xs">_</div> ขาดตัวอักษร</div>
-                 <div className="flex items-center gap-1"><div className="w-4 h-4 bg-red-500 text-white text-center text-xs">A</div> เกินมา</div>
-              </div>
-            )}
-          </div>
-        )}
+        </div>
 
-      </div>
+        <!-- Reference Area -->
+        <div id="reference-area" class="animate-fade-in space-y-2">
+            <div class="mb-2 text-xs uppercase tracking-wide font-semibold ml-1 
+                        text-gray-400 dark:text-gray-500">Original Text</div>
+            <div id="reference-content" class="font-sans leading-relaxed text-lg p-6 rounded shadow-sm border 
+                        bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700
+                        text-gray-800 dark:text-gray-200">
+                <!-- Content will be injected by JS -->
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="space-y-2">
+            <div class="flex justify-between items-end">
+                <label for="user-input" class="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">พื้นที่ฝึกพิมพ์ของคุณ</label>
+                <span class="text-xs text-gray-400 dark:text-gray-500">ห้ามใส่เครื่องหมาย _ (ขีดเส้นใต้) ให้พิมพ์แค่ตัวอักษร</span>
+            </div>
+            <textarea
+                id="user-input"
+                placeholder="พิมพ์ข้อความที่นี่... (เริ่มด้วยชื่อเรื่อง แล้วขึ้นบรรทัดใหม่เพื่อเขียนเนื้อหา)"
+                class="w-full h-64 p-6 rounded-lg border shadow-inner text-lg leading-relaxed focus:ring-2 outline-none resize-y font-sans 
+                       bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-100
+                       focus:ring-blue-500 focus:border-blue-500"
+                spellcheck="false"
+            ></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4 justify-center pt-2">
+            <button
+                id="reset-button"
+                class="flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all
+                       bg-gray-200 text-gray-700 hover:bg-gray-300 
+                       dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            >
+                <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                เริ่มใหม่
+            </button>
+            <button
+                id="check-button"
+                class="flex items-center gap-2 px-8 py-3 rounded-full font-bold text-white shadow-lg transition-all transform hover:scale-105 active:scale-95 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:dark:bg-gray-600 disabled:dark:text-gray-400"
+                disabled
+            >
+                <i data-lucide="check" class="w-5 h-5"></i>
+                ตรวจคำตอบ
+            </button>
+        </div>
+
+        <!-- Results Area -->
+        <div id="results-area" class="hidden">
+            <!-- Results will be injected by JS -->
+        </div>
+
     </div>
-  );
-}
+
+    <script>
+        // --- CONSTANTS ---
+        const TARGET_TITLE = "A Memorable Visit to the Golden Temple";
+        const TARGET_BODY = "Thailand is renowned for its breathtaking cultural heritage. This picture captures a magnificent moment at a famous tourist attraction, known as the Grand Palace. The scene features two beautiful women enjoying their holiday. Dressed in stylish outfits and wearing wide-brimmed hats to protect against the sun, they stroll gracefully across the stone floor. The background is truly stunning. One can see the majestic temples and the iconic golden stupa shining brightly under the clear sky, which is a lovely mix of blue and white. The area is beautifully decorated with green ornamental trees, adding a touch of nature to the sacred architecture. As they walk through this spiritual place, they might plan to pay respect to the Buddha or make merit. Their smiling faces clearly show that they are happy and impressed by the beauty of Thai culture.";
+        const FULL_TARGET = `${TARGET_TITLE}\n${TARGET_BODY}`;
+
+        // --- DOM ELEMENTS ---
+        const root = document.documentElement;
+        const userInput = document.getElementById('user-input');
+        const checkButton = document.getElementById('check-button');
+        const resetButton = document.getElementById('reset-button');
+        const toggleReferenceButton = document.getElementById('toggle-reference');
+        const referenceArea = document.getElementById('reference-area');
+        const referenceContent = document.getElementById('reference-content');
+        const resultsArea = document.getElementById('results-area');
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const eyeIcon = document.getElementById('eye-icon');
+        const eyeOffIcon = document.getElementById('eye-off-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const sunIcon = document.getElementById('sun-icon');
+        const referenceTextSpan = document.getElementById('reference-text');
+        
+        let isReferenceVisible = true;
+
+        // --- DARK MODE LOGIC ---
+        function applyDarkMode(isDark) {
+            if (isDark) {
+                root.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                moonIcon.classList.add('hidden');
+                sunIcon.classList.remove('hidden');
+            } else {
+                root.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
+            }
+        }
+
+        function setupDarkMode() {
+            const savedMode = localStorage.getItem('theme');
+            let isDark = false;
+            if (savedMode) {
+                isDark = savedMode === 'dark';
+            } else {
+                isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+            applyDarkMode(isDark);
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            const isCurrentlyDark = root.classList.contains('dark');
+            applyDarkMode(!isCurrentlyDark);
+        });
+
+        // --- INITIAL RENDER FUNCTIONS ---
+
+        function renderReferenceText() {
+            referenceContent.innerHTML = `
+                <h2 class="text-xl font-bold text-center mb-4 text-gray-900 dark:text-white">${TARGET_TITLE}</h2>
+                <p class="text-justify whitespace-pre-wrap">${TARGET_BODY}</p>
+            `;
+        }
+
+        function toggleReference() {
+            isReferenceVisible = !isReferenceVisible;
+            referenceArea.classList.toggle('hidden', !isReferenceVisible);
+            
+            eyeIcon.classList.toggle('hidden', !isReferenceVisible);
+            eyeOffIcon.classList.toggle('hidden', isReferenceVisible);
+            referenceTextSpan.textContent = isReferenceVisible ? 'ซ่อน' : 'แสดง';
+        }
+        
+        // --- CHECK LOGIC (Simplified Non-Cascading) ---
+        function renderResults(diff, isPerfect) {
+            resultsArea.classList.remove('hidden');
+            resultsArea.innerHTML = `
+                <div id="result-card" class="rounded-xl p-6 border-2 shadow-lg scroll-mt-10 ${
+                    isPerfect 
+                        ? 'border-green-500 bg-green-50 dark:bg-green-900' 
+                        : 'border-red-200 bg-white dark:bg-gray-800'
+                }">
+                    <div class="flex items-center gap-3 mb-4 border-b pb-4 border-gray-200 dark:border-gray-700">
+                        <div class="${isPerfect 
+                            ? 'bg-green-100 dark:bg-green-700 text-green-600 dark:text-green-300' 
+                            : 'bg-red-100 dark:bg-red-700 text-red-600 dark:text-red-300'} p-2 rounded-full">
+                            <i data-lucide="${isPerfect ? 'award' : 'alert-circle'}" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold ${
+                                isPerfect 
+                                    ? 'text-green-800 dark:text-green-300' 
+                                    : 'text-red-800 dark:text-red-300'
+                            }">
+                                ${isPerfect ? "สุดยอด! ถูกต้องทุกตัวอักษร" : "ยังไม่ถูกต้องร้อยเปอร์เซ็นต์"}
+                            </h3>
+                            ${!isPerfect ? '<p class="text-red-600 dark:text-red-400 text-sm">พบจุดผิดพลาดตามรายการด้านล่าง (สีแดง/สีเหลือง)</p>' : ''}
+                        </div>
+                    </div>
+
+                    <div id="diff-output" class="font-mono text-lg leading-loose break-words p-4 rounded border 
+                          bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 
+                          text-gray-800 dark:text-gray-100">
+                    </div>
+                    
+                    ${!isPerfect ? `
+                    <div class="mt-4 text-sm flex flex-wrap gap-4 
+                            text-gray-500 dark:text-gray-400">
+                         <div class="flex items-center gap-1"><span class="w-4 h-4 bg-green-100 dark:bg-green-700 text-green-600 dark:text-green-300 text-center text-xs border border-green-200 dark:border-green-600">A</span> ถูกต้อง</div>
+                         <div class="flex items-center gap-1"><span class="w-4 h-4 bg-red-200 dark:bg-red-600 text-red-800 dark:text-red-100 text-center text-xs border border-red-300 dark:border-red-500">A</span> พิมพ์ผิด (เอาเมาส์ชี้เพื่อดูเฉลย)</div>
+                         <div class="flex items-center gap-1"><span class="w-4 h-4 bg-yellow-200 dark:bg-yellow-600 text-yellow-800 dark:text-yellow-100 border border-yellow-400 text-center text-xs">_</span> ขาดตัวอักษร</div>
+                         <div class="flex items-center gap-1"><span class="w-4 h-4 bg-red-500 text-white text-center text-xs">A</span> พิมพ์เกินมา</div>
+                    </div>` : ''}
+                </div>
+            `;
+            
+            // Re-run createIcons for the newly injected icons
+            if (typeof createIcons !== 'undefined') {
+                 import('https://unpkg.com/lucide@latest').then(({ createIcons }) => {
+                     createIcons();
+                 });
+            }
+
+            const diffOutput = document.getElementById('diff-output');
+            diff.forEach(item => {
+                let span = document.createElement('span');
+                span.classList.add('inline-block', 'mx-0.5', 'relative', 'group');
+                let charDisplay = item.char === ' ' ? '␣' : (item.char === '\n' ? '↵' : item.char);
+
+                if (item.status === 'correct') {
+                    span.classList.add('text-green-600', 'dark:text-green-400');
+                    span.textContent = item.char;
+                } else if (item.status === 'wrong') {
+                    span.innerHTML = `<span class="bg-red-200 dark:bg-red-600 text-red-800 dark:text-red-100 px-1 rounded">${charDisplay}</span>`;
+                    let expectedChar = item.expected === ' ' ? 'เว้นวรรค' : (item.expected === '\n' ? 'ขึ้นบรรทัดใหม่' : item.expected);
+                    span.title = `แก้เป็น: ${expectedChar}`;
+                } else if (item.status === 'missing') {
+                    span.innerHTML = `<span class="bg-yellow-200 dark:bg-yellow-600 text-yellow-800 dark:text-yellow-100 px-1 rounded border border-yellow-400">_</span>`;
+                    let missingChar = item.char === ' ' ? 'เว้นวรรค' : (item.char === '\n' ? 'ขึ้นบรรทัดใหม่' : item.char);
+                    span.title = `ขาดตัว: ${missingChar}`;
+                } else if (item.status === 'extra') {
+                    span.innerHTML = `<span class="bg-red-500 text-white px-1 rounded">${charDisplay}</span>`;
+                    span.title = `พิมพ์เกิน`;
+                }
+                diffOutput.appendChild(span);
+            });
+
+            // Scroll to results
+            const resultCard = document.getElementById('result-card');
+            if (resultCard) {
+                resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function handleCheck() {
+            const input = userInput.value;
+            const target = FULL_TARGET;
+            const diff = [];
+            let errorCount = 0;
+            const maxLength = Math.max(input.length, target.length);
+
+            for (let i = 0; i < maxLength; i++) {
+                const userChar = input[i];
+                const targetChar = target[i];
+
+                if (userChar === targetChar) {
+                    diff.push({ status: 'correct', char: userChar });
+                } else {
+                    errorCount++;
+                    if (targetChar === undefined) {
+                        // User typed extra characters at the end
+                        diff.push({ status: 'extra', char: userChar });
+                    } else if (userChar === undefined) {
+                        // User stopped short (missing the rest)
+                        diff.push({ status: 'missing', char: targetChar });
+                    } else {
+                        // Wrong character at this exact spot (Substitution error)
+                        diff.push({ status: 'wrong', char: userChar, expected: targetChar });
+                    }
+                }
+            }
+
+            renderResults(diff, errorCount === 0);
+        }
+
+        function handleReset() {
+            userInput.value = "";
+            resultsArea.classList.add('hidden');
+            checkButton.disabled = true;
+            document.getElementById('status').textContent = 'สถานะ: ยังไม่เริ่ม';
+        }
+
+        // --- EVENT LISTENERS ---
+        userInput.addEventListener('input', () => {
+            checkButton.disabled = userInput.value.length === 0;
+            document.getElementById('status').textContent = userInput.value.length === 0 ? 'สถานะ: ยังไม่เริ่ม' : 'สถานะ: กำลังพิมพ์...';
+            // Hide previous results when user starts typing again
+            resultsArea.classList.add('hidden');
+        });
+
+        checkButton.addEventListener('click', handleCheck);
+        resetButton.addEventListener('click', handleReset);
+        toggleReferenceButton.addEventListener('click', toggleReference);
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            setupDarkMode();
+            renderReferenceText();
+        });
+
+    </script>
+</body>
+</html>
