@@ -60,26 +60,45 @@
         </header>
 
         <!-- Control Bar -->
-        <div id="control-bar" class="flex justify-between items-center p-4 rounded-lg shadow-md 
+        <div id="control-bar" class="p-4 rounded-lg shadow-md 
                       bg-white dark:bg-gray-800 transition-colors">
-            <div class="flex items-center gap-4">
-                <!-- Dark Mode Toggle Button -->
-                <button id="dark-mode-toggle" class="p-2 rounded-full text-gray-700 dark:text-yellow-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Toggle Dark Mode">
-                    <i data-lucide="moon" id="moon-icon" class="w-5 h-5 hidden"></i>
-                    <i data-lucide="sun" id="sun-icon" class="w-5 h-5 hidden"></i>
+            
+            <!-- Set Selection -->
+            <div class="mb-4 flex flex-wrap items-center gap-4 border-b pb-4 border-gray-100 dark:border-gray-700">
+                <span class="font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">เลือกชุดฝึก:</span>
+                <button id="set-1-button" class="set-button px-4 py-2 rounded-full text-sm font-medium transition-colors bg-blue-600 text-white dark:bg-blue-700 dark:hover:bg-blue-600">
+                    ชุดที่ 1 (Golden Temple)
                 </button>
-              
-                <div class="flex items-center gap-2">
-                    <span class="font-semibold text-gray-700 dark:text-gray-300">ต้นฉบับ:</span>
-                    <button id="toggle-reference" class="flex items-center gap-2 px-3 py-1.5 rounded bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-700 transition-colors text-sm font-medium">
-                        <i data-lucide="eye-off" id="eye-off-icon" class="w-4 h-4"></i>
-                        <i data-lucide="eye" id="eye-icon" class="w-4 h-4 hidden"></i>
-                        <span id="reference-text">ซ่อน</span>
-                    </button>
-                </div>
+                <button id="set-2-button" class="set-button px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500">
+                    ชุดที่ 2 (Our School)
+                </button>
+                <!-- NEW SET 3 BUTTON -->
+                <button id="set-3-button" class="set-button px-4 py-2 rounded-full text-sm font-medium transition-colors bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500">
+                    ชุดที่ 3 (Good Tradition)
+                </button>
             </div>
-            <div id="status" class="text-sm text-gray-500 dark:text-gray-400">
-                สถานะ: ยังไม่เริ่ม
+            
+            <!-- Reference and Dark Mode Controls -->
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <!-- Dark Mode Toggle Button -->
+                    <button id="dark-mode-toggle" class="p-2 rounded-full text-gray-700 dark:text-yellow-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" aria-label="Toggle Dark Mode">
+                        <i data-lucide="moon" id="moon-icon" class="w-5 h-5 hidden"></i>
+                        <i data-lucide="sun" id="sun-icon" class="w-5 h-5 hidden"></i>
+                    </button>
+                  
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-gray-700 dark:text-gray-300">ต้นฉบับ:</span>
+                        <button id="toggle-reference" class="flex items-center gap-2 px-3 py-1.5 rounded bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-700 transition-colors text-sm font-medium">
+                            <i data-lucide="eye-off" id="eye-off-icon" class="w-4 h-4"></i>
+                            <i data-lucide="eye" id="eye-icon" class="w-4 h-4 hidden"></i>
+                            <span id="reference-text">ซ่อน</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="status" class="text-sm text-gray-500 dark:text-gray-400">
+                    สถานะ: ยังไม่เริ่ม
+                </div>
             </div>
         </div>
 
@@ -139,10 +158,24 @@
     </div>
 
     <script>
-        // --- CONSTANTS ---
-        const TARGET_TITLE = "A Memorable Visit to the Golden Temple";
-        const TARGET_BODY = "Thailand is renowned for its breathtaking cultural heritage. This picture captures a magnificent moment at a famous tourist attraction, known as the Grand Palace. The scene features two beautiful women enjoying their holiday. Dressed in stylish outfits and wearing wide-brimmed hats to protect against the sun, they stroll gracefully across the stone floor. The background is truly stunning. One can see the majestic temples and the iconic golden stupa shining brightly under the clear sky, which is a lovely mix of blue and white. The area is beautifully decorated with green ornamental trees, adding a touch of nature to the sacred architecture. As they walk through this spiritual place, they might plan to pay respect to the Buddha or make merit. Their smiling faces clearly show that they are happy and impressed by the beauty of Thai culture.";
-        const FULL_TARGET = `${TARGET_TITLE}\n${TARGET_BODY}`;
+        // --- CONSTANTS: TEXT SETS ---
+        const TEXT_SETS = {
+            1: {
+                title: "A Memorable Visit to the Golden Temple",
+                body: "Thailand is renowned for its breathtaking cultural heritage. This picture captures a magnificent moment at a famous tourist attraction, known as the Grand Palace. The scene features two beautiful women enjoying their holiday. Dressed in stylish outfits and wearing wide-brimmed hats to protect against the sun, they stroll gracefully across the stone floor. The background is truly stunning. One can see the majestic temples and the iconic golden stupa shining brightly under the clear sky, which is a lovely mix of blue and white. The area is beautifully decorated with green ornamental trees, adding a touch of nature to the sacred architecture. As they walk through this spiritual place, they might plan to pay respect to the Buddha or make merit. Their smiling faces clearly show that they are happy and impressed by the beauty of Thai culture."
+            },
+            2: {
+                title: "Our School",
+                body: "In the picture of our school, the Thai flag rises gently above the yard, catching the morning light like a small promise of a bright day. Beneath it, the big clock on the main building shows that it is almost time for class. Every student is walking happily to their rooms, spreading a feeling of quiet energy.\n\nAt the front gate, the school bus has just arrived, and the driver greets everyone with a friendly nod. Our school name is written clearly on a green and yellow sign that shows we are proud of our province and our community. Around the campus, the fence stands strong, keeping the school safe and peaceful.\n\nThis picture reminds me that our school is not only a place to study but a place filled with care, color, and hope."
+            },
+            3: {
+                title: "Good Tradition",
+                body: "In the picture, families are celebrating Songkran, a beloved festival that arrives every April with sunlight, laughter, and a sense of renewal. At the temple, many people come together to make merit, offering flowers, food, and quiet prayers. Their gentle actions create a peaceful rhythm that seems to echo across the warm morning. Nearby, children cheerfully splash water, sending cool droplets into the air as if inviting everyone to join the joy.\n\nAlong the sandy ground, villagers patiently build a pile of sand, shaping it into small pagodas that stand like symbols of hope. Each grain added to the pagoda feels like a wish for good days ahead. This activity, though simple, carries the heart of tradition and reminds the community of kindness and unity.\n\nThe whole scene shows the beauty of a good tradition that keeps families close, strengthens friendships, and connects the present with the past in a gentle, meaningful way."
+            }
+        };
+
+        // --- GLOBAL STATE ---
+        let currentSet = 1;
 
         // --- DOM ELEMENTS ---
         const root = document.documentElement;
@@ -159,8 +192,19 @@
         const moonIcon = document.getElementById('moon-icon');
         const sunIcon = document.getElementById('sun-icon');
         const referenceTextSpan = document.getElementById('reference-text');
+        const setButtons = document.querySelectorAll('.set-button');
+        const set1Button = document.getElementById('set-1-button');
+        const set2Button = document.getElementById('set-2-button');
+        const set3Button = document.getElementById('set-3-button');
         
         let isReferenceVisible = true;
+
+        // --- HELPER FUNCTION: Get Current Target Text ---
+        function getCurrentTarget() {
+            const set = TEXT_SETS[currentSet];
+            // Combine title and body with a single newline separator
+            return `${set.title}\n${set.body}`;
+        }
 
         // --- DARK MODE LOGIC ---
         function applyDarkMode(isDark) {
@@ -193,12 +237,13 @@
             applyDarkMode(!isCurrentlyDark);
         });
 
-        // --- INITIAL RENDER FUNCTIONS ---
+        // --- REFERENCE DISPLAY & SET SELECTION ---
 
         function renderReferenceText() {
+            const set = TEXT_SETS[currentSet];
             referenceContent.innerHTML = `
-                <h2 class="text-xl font-bold text-center mb-4 text-gray-900 dark:text-white">${TARGET_TITLE}</h2>
-                <p class="text-justify whitespace-pre-wrap">${TARGET_BODY}</p>
+                <h2 class="text-xl font-bold text-center mb-4 text-gray-900 dark:text-white">${set.title}</h2>
+                <p class="text-justify whitespace-pre-wrap">${set.body}</p>
             `;
         }
 
@@ -210,7 +255,32 @@
             eyeOffIcon.classList.toggle('hidden', isReferenceVisible);
             referenceTextSpan.textContent = isReferenceVisible ? 'ซ่อน' : 'แสดง';
         }
+
+        function setActiveSetButton(setNumber) {
+            setButtons.forEach(btn => {
+                // Parse the set number from the button ID (e.g., 'set-1-button' -> 1)
+                const btnSetNumber = parseInt(btn.id.split('-')[1]);
+                const isActive = btnSetNumber === setNumber;
+
+                if (isActive) {
+                    btn.classList.remove('bg-gray-200', 'text-gray-700', 'dark:bg-gray-600', 'dark:text-gray-200', 'hover:bg-gray-300', 'dark:hover:bg-gray-500');
+                    btn.classList.add('bg-blue-600', 'text-white', 'dark:bg-blue-700', 'dark:hover:bg-blue-600');
+                } else {
+                    btn.classList.add('bg-gray-200', 'text-gray-700', 'dark:bg-gray-600', 'dark:text-gray-200', 'hover:bg-gray-300', 'dark:hover:bg-gray-500');
+                    btn.classList.remove('bg-blue-600', 'text-white', 'dark:bg-blue-700', 'dark:hover:bg-blue-600');
+                }
+            });
+        }
         
+        function loadSet(setNumber) {
+            if (currentSet === setNumber) return; // Prevent unnecessary reload
+            currentSet = setNumber;
+            
+            renderReferenceText();
+            handleReset(); // Reset input and results when changing sets
+            setActiveSetButton(setNumber);
+        }
+
         // --- CHECK LOGIC (Simplified Non-Cascading) ---
         function renderResults(diff, isPerfect) {
             resultsArea.classList.remove('hidden');
@@ -264,7 +334,8 @@
             const diffOutput = document.getElementById('diff-output');
             diff.forEach(item => {
                 let span = document.createElement('span');
-                span.classList.add('inline-block', 'mx-0.5', 'relative', 'group');
+                span.classList.add('inline-block', 'relative', 'group');
+                // Use special characters for spaces and newlines for clarity in the error output
                 let charDisplay = item.char === ' ' ? '␣' : (item.char === '\n' ? '↵' : item.char);
 
                 if (item.status === 'correct') {
@@ -275,8 +346,8 @@
                     let expectedChar = item.expected === ' ' ? 'เว้นวรรค' : (item.expected === '\n' ? 'ขึ้นบรรทัดใหม่' : item.expected);
                     span.title = `แก้เป็น: ${expectedChar}`;
                 } else if (item.status === 'missing') {
-                    span.innerHTML = `<span class="bg-yellow-200 dark:bg-yellow-600 text-yellow-800 dark:text-yellow-100 px-1 rounded border border-yellow-400">_</span>`;
                     let missingChar = item.char === ' ' ? 'เว้นวรรค' : (item.char === '\n' ? 'ขึ้นบรรทัดใหม่' : item.char);
+                    span.innerHTML = `<span class="bg-yellow-200 dark:bg-yellow-600 text-yellow-800 dark:text-yellow-100 px-1 rounded border border-yellow-400">_</span>`;
                     span.title = `ขาดตัว: ${missingChar}`;
                 } else if (item.status === 'extra') {
                     span.innerHTML = `<span class="bg-red-500 text-white px-1 rounded">${charDisplay}</span>`;
@@ -294,7 +365,7 @@
 
         function handleCheck() {
             const input = userInput.value;
-            const target = FULL_TARGET;
+            const target = getCurrentTarget();
             const diff = [];
             let errorCount = 0;
             const maxLength = Math.max(input.length, target.length);
@@ -341,11 +412,14 @@
         checkButton.addEventListener('click', handleCheck);
         resetButton.addEventListener('click', handleReset);
         toggleReferenceButton.addEventListener('click', toggleReference);
+        set1Button.addEventListener('click', () => loadSet(1));
+        set2Button.addEventListener('click', () => loadSet(2));
+        set3Button.addEventListener('click', () => loadSet(3));
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             setupDarkMode();
-            renderReferenceText();
+            loadSet(1); // Load default set (Set 1) on startup
         });
 
     </script>
